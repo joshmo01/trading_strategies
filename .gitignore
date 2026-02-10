@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+myenv/
+.python-version
+
+# macOS
+.DS_Store
+
+# Data files
+*.csv
+*.xls
+*.xlsx
+*.numbers
+*.jsonl
+
+# Images / Charts (generated output)
+*.png
+
+# Node
+node_modules/
+package-lock.json
+
+# Output directories
+tp_output/
+output/
+backtest_results/
+plots/
+analysis/
+SPY_window_details/
+
+# Archives
+*.zip
+*.crdownload
+
+# Misc
+*.docx
+*.rtf

@@ -1,0 +1,28 @@
+# requirements.txt
+
+# Core data handling and analysis
+pandas
+numpy
+
+# Financial data acquisition
+yfinance
+
+# Technical Analysis Indicators
+# Note: The TA-Lib Python wrapper requires the TA-Lib C library to be installed on your system first.
+# See https://mrjbq7.github.io/ta-lib/install.html for installation instructions for the C library.
+TA-Lib
+
+# Scientific and signal processing (for argrelextrema, linregress)
+scipy
+
+# Plotting
+matplotlib
+
+# No specific versions are pinned, so pip will install the latest compatible versions.
+# If you encounter issues, you might need to pin specific versions, e.g.:
+# pandas==1.5.3
+# numpy==1.23.5
+# yfinance==0.2.12
+# TA-Lib==0.4.28
+# scipy==1.10.0
+# matplotlib==3.7.0
