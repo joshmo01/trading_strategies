@@ -1,28 +1,22 @@
-# requirements.txt
+# Core Data & Math
+numpy>=1.24.0
+pandas>=2.0.0
+scipy>=1.10.0
 
-# Core data handling and analysis
-pandas
-numpy
+# Turning Point Detection Methods
+PyWavelets>=1.4.1       # Method 3: Wavelet Multi-Resolution Analysis
+ruptures>=1.1.7         # Method 4: PELT Change Point Detection
 
-# Financial data acquisition
-yfinance
+# Market Data
+yfinance>=0.2.30
 
-# Technical Analysis Indicators
-# Note: The TA-Lib Python wrapper requires the TA-Lib C library to be installed on your system first.
-# See https://mrjbq7.github.io/ta-lib/install.html for installation instructions for the C library.
-TA-Lib
+# Visualization & Reporting
+matplotlib>=3.7.0
+openpyxl>=3.1.0         # Excel report generation
 
-# Scientific and signal processing (for argrelextrema, linregress)
-scipy
+# Claude Agent SDK (for trading_agent.py)
+claude-agent-sdk>=0.0.1
 
-# Plotting
-matplotlib
-
-# No specific versions are pinned, so pip will install the latest compatible versions.
-# If you encounter issues, you might need to pin specific versions, e.g.:
-# pandas==1.5.3
-# numpy==1.23.5
-# yfinance==0.2.12
-# TA-Lib==0.4.28
-# scipy==1.10.0
-# matplotlib==3.7.0
+# CLI & Terminal UI (used by skill wrapper)
+typer[all]>=0.9.0
+rich>=13.0.0
