@@ -37,3 +37,9 @@ SPY_window_details/
 # Misc
 *.docx
 *.rtf
+
+# Files with hardcoded credentials / experimental
+dspy1.py
+
+# Claude Code local settings
+.claude/settings.local.json

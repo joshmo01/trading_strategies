@@ -1,7 +1,6 @@
 ---
-name: stock-tp-analysis
+name: stock-turning-point-analysis
 description: Run a complete Stock Turning Point Analysis — detect peaks/troughs using 6 mathematical methods + ensemble consensus, backtest all strategies, compute P&L, generate charts and Excel reports.
-user_invocable: true
 ---
 
 # Stock Turning Point Analysis

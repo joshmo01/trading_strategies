@@ -217,7 +217,7 @@ def method_pelt(prices, penalty=1.5):
 def method_bry_boschan(prices, min_phase=22, min_cycle=15, window=5, min_amplitude=3.0):
     """Method 5: Bry-Boschan Algorithm (adapted for daily data)."""
     n = len(prices)
-    sm = pd.Series(prices).rolling(13, center=True).mean().values
+    sm = pd.Series(prices).rolling(13, center=True).mean().values.copy()
     for i in range(6):
         sm[i] = prices[i]
         sm[-(i + 1)] = prices[-(i + 1)]
@@ -1584,3 +1584,93 @@ if __name__ == '__main__':
         start_date=args.start, end_date=args.end,
         capital=args.capital, output_dir=args.output,
     )
+
+    # ============================================================
+# OUTPUT & REPORTING (The Missing Part)
+# ============================================================
+
+def run_full_analysis(ticker=None, csv_path=None, period='2y', capital=100000.0, output_dir="output"):
+    """
+    Main entry point: Loads data, detects points, runs backtests, and SAVES files.
+    """
+    # 1. Ensure output directory exists
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    # 2. Load Data
+    print(f"Loading data for {ticker or csv_path}...")
+    df = load_data(ticker=ticker, csv_path=csv_path, period=period)
+    prices = df['Close'].values
+    dates = df['Date'].values
+    n = len(prices)
+
+    # 3. Detect Turning Points
+    print("Running 7 mathematical detection methods...")
+    results = detect_all_turning_points(prices, df=df)
+    
+    # Get Ensemble Points for the main backtest
+    ens = results['8. Ensemble Consensus']
+    
+    # 4. Generate Backtests
+    print("Computing P&L and Strategy Stats...")
+    # Strategy A: Ensemble Turning Points
+    trade_seq = generate_trades(ens['peaks'], ens['troughs'], prices, dates)
+    strategy_df, completed_trades = compute_pnl(trade_seq, prices, dates, capital)
+    
+    # Strategy B: Benchmark (Buy & Hold)
+    bh_df, bh_trades = compute_buy_hold(prices, dates, capital)
+
+    # 5. SAVE EXCEL REPORT
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M")
+    filename = f"{ticker or 'stock'}_analysis_{timestamp}.xlsx"
+    save_path = os.path.join(output_dir, filename)
+    
+    with pd.ExcelWriter(save_path, engine='openpyxl') as writer:
+        strategy_df.to_excel(writer, sheet_name='Daily_PNL', index=False)
+        pd.DataFrame(completed_trades).to_excel(writer, sheet_name='Completed_Trades', index=False)
+        # Add a summary sheet
+        summary_data = {
+            'Metric': ['Total Return', 'Max Drawdown', 'Win Rate'],
+            'Strategy': [f"{strategy_df['Total_Equity'].iloc[-1]/capital-1:.2%}", "N/A", "N/A"]
+        }
+        pd.DataFrame(summary_data).to_excel(writer, sheet_name='Summary', index=False)
+
+    print(f"✅ Excel Report saved to: {save_path}")
+
+    # 6. SAVE CHART
+    chart_filename = f"{ticker or 'stock'}_chart_{timestamp}.png"
+    chart_path = os.path.join(output_dir, chart_filename)
+    
+    plt.figure(figsize=(15, 8))
+    plt.plot(df['Date'], df['Close'], label='Price', color='black', alpha=0.6)
+    plt.scatter(df.iloc[ens['troughs']]['Date'], df.iloc[ens['troughs']]['Close'], color='green', marker='^', label='Consensus Buy')
+    plt.scatter(df.iloc[ens['peaks']]['Date'], df.iloc[ens['peaks']]['Close'], color='red', marker='v', label='Consensus Sell')
+    plt.title(f"Turning Point Analysis: {ticker}")
+    plt.legend()
+    plt.savefig(chart_path)
+    plt.close()
+    
+    print(f"✅ Chart saved to: {chart_path}")
+    return results
+
+# Add this at the very bottom so the script can be run directly
+if __name__ == "__main__":
+    # 1. Set a path directly to your Mac Desktop so you can see it
+    desktop_path = os.path.expanduser("~/Desktop/Stock_Analysis")
+    
+    if not os.path.exists(desktop_path):
+        os.makedirs(desktop_path)
+        print(f"--- Created folder at: {desktop_path} ---")
+
+    # 2. Run the analysis
+    # This calls the function we defined in the previous step
+    try:
+        run_full_analysis(ticker="TSLA", period="2y", output_dir=desktop_path)
+        
+        print("\n" + "="*30)
+        print("🚀 ANALYSIS COMPLETE!")
+        print(f"Check your Desktop folder: 'Stock_Analysis'")
+        print("="*30)
+        
+    except Exception as e:
+        print(f"❌ ERROR: {e}")
